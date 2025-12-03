@@ -62,7 +62,7 @@ func (m model) View() string {
 }
 
 func main() {
-	p := tea.NewProgram(initModel())
+	p := tea.NewProgram(initModel(), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		panic("Ghand lag gayi")
 	}
