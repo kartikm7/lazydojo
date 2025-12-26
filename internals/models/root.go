@@ -2,16 +2,21 @@
 // models include Root and Home at the moment
 package models
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"database/sql"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 // rootModel, is just a wrapper to allow switching between models
 type rootModel struct {
 	model tea.Model
+	db    *sql.DB
 }
 
-func InitRootModel() rootModel {
+func InitRootModel(db *sql.DB) rootModel {
 	initScreen := InitHomeModel()
-	return rootModel{model: initScreen}
+	return rootModel{model: initScreen, db: db}
 }
 
 func (m rootModel) Init() tea.Cmd {

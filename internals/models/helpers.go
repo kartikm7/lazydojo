@@ -10,11 +10,11 @@ func DefaultBinding(msg tea.Msg, m tea.Model) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "H", "ctrl+1":
+		case "ctrl+1":
 			return InitHomeModel(), nil
-		case "T", "ctrl+2":
+		case "ctrl+2":
 			return InitTimerModel(), nil
-		case "A", "ctrl+3":
+		case "ctrl+3":
 			return InitFormModel(), nil
 		default:
 			return m, nil
