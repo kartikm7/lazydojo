@@ -11,12 +11,11 @@ import (
 // rootModel, is just a wrapper to allow switching between models
 type rootModel struct {
 	model tea.Model
-	db    *sql.DB
 }
 
 func InitRootModel(db *sql.DB) rootModel {
-	initScreen := InitHomeModel()
-	return rootModel{model: initScreen, db: db}
+	initScreen := InitHomeModel(db)
+	return rootModel{model: initScreen}
 }
 
 func (m rootModel) Init() tea.Cmd {

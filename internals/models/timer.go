@@ -1,13 +1,15 @@
 package models
 
 import (
+	"database/sql"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type timerModel struct{}
+type timerModel struct{ db *sql.DB }
 
-func InitTimerModel() timerModel {
-	return timerModel{}
+func InitTimerModel(db *sql.DB) timerModel {
+	return timerModel{db}
 }
 
 func (m timerModel) Init() tea.Cmd {
@@ -15,7 +17,7 @@ func (m timerModel) Init() tea.Cmd {
 }
 
 func (m timerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return DefaultBinding(msg, m)
+	return DefaultBinding(msg, m, m.db)
 }
 
 func (m timerModel) View() string {

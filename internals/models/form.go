@@ -1,22 +1,25 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/kartikm7/lazydojo/pkg/db"
 )
 
 type formModel struct {
 	textInput textinput.Model
+	db        *sql.DB
 }
 
-func InitFormModel() formModel {
+func InitFormModel(db *sql.DB) formModel {
 	ti := textinput.New()
 	ti.Placeholder = "What you practicing at the Dojo?"
 	ti.Focus()
 	ti.Width = 50
-	return formModel{ti}
+	return formModel{textInput: ti, db: db}
 }
 
 func (m formModel) Init() tea.Cmd {
@@ -26,7 +29,16 @@ func (m formModel) Init() tea.Cmd {
 func (m formModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	updated, globalcmd := DefaultBinding(msg, m)
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyEnter:
+			db.Add(m.db, m.textInput.Value())
+			return m, nil
+		}
+	}
+
+	updated, globalcmd := DefaultBinding(msg, m, m.db)
 	if assert, ok := updated.(formModel); ok {
 		m = assert
 	}

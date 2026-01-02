@@ -1,6 +1,8 @@
 package models
 
 import (
+	"database/sql"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -69,13 +71,15 @@ type homeModel struct {
 	keys       keyMap
 	help       help.Model
 	inputStyle lipgloss.Style
+	db         *sql.DB
 }
 
-func InitHomeModel() homeModel {
+func InitHomeModel(db *sql.DB) homeModel {
 	return homeModel{
 		keys:       keys,
 		help:       help.New(),
 		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
+		db:         db,
 	}
 }
 
@@ -92,7 +96,7 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 		}
 	}
-	return DefaultBinding(msg, m)
+	return DefaultBinding(msg, m, m.db)
 }
 
 func (m homeModel) View() string {

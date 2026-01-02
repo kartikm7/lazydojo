@@ -35,3 +35,8 @@ func Delete(db *sql.DB, id int) error {
 	_, err := db.Exec("DELETE FROM tasks WHERE id = ?", id)
 	return err
 }
+
+func ListEverything(db *sql.DB) (sql.Result, error) {
+	res, err := db.Exec("SELECT * FROM tasks")
+	return res, err
+}
