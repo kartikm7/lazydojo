@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/kartikm7/lazydojo/pkg/db"
 )
 
@@ -15,10 +16,11 @@ type formModel struct {
 }
 
 func InitFormModel(db *sql.DB) formModel {
+	width, _ := GetTermSize()
 	ti := textinput.New()
 	ti.Placeholder = "What you practicing at the Dojo?"
 	ti.Focus()
-	ti.Width = 50
+	ti.Width = width / 2
 	return formModel{textInput: ti, db: db}
 }
 
@@ -47,5 +49,8 @@ func (m formModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m formModel) View() string {
-	return fmt.Sprintf("Form\n%s", m.textInput.View())
+	width, height := GetTermSize()
+	parent := lipgloss.NewStyle().Width(width).Height(height).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center)
+	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("420")).Padding(1, 2)
+	return fmt.Sprint(parent.Render(text.Render(m.textInput.View())))
 }
