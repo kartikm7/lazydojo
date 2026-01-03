@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	catppuccin "github.com/catppuccin/go"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -21,6 +22,7 @@ func InitFormModel(db *sql.DB) formModel {
 	ti.Placeholder = "What you practicing at the Dojo?"
 	ti.Focus()
 	ti.Width = width / 2
+	ti.TextStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(catppuccin.Latte.Text().Hex))
 	return formModel{textInput: ti, db: db}
 }
 
@@ -51,6 +53,6 @@ func (m formModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m formModel) View() string {
 	width, height := GetTermSize()
 	parent := lipgloss.NewStyle().Width(width).Height(height).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center)
-	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#ea76cb")).Padding(1, 2)
+	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(catppuccin.Latte.Lavender().Hex)).Padding(1, 2)
 	return fmt.Sprint(parent.Render(text.Render(m.textInput.View())))
 }
