@@ -100,6 +100,9 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m homeModel) View() string {
+	width, height := GetTermSize()
+	parent := lipgloss.NewStyle().Width(width).Height(height).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center)
+	help := lipgloss.NewStyle().Width(width)
 	helpView := m.help.View(m.keys)
-	return "Home screen\n" + helpView
+	return parent.Render("Home screen") + "\n" + help.Render(helpView)
 }
