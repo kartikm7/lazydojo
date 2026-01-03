@@ -2,11 +2,16 @@ package models
 
 import (
 	"database/sql"
+	"log"
+	"strconv"
 
+	catppuccingo "github.com/catppuccin/go"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	query "github.com/kartikm7/lazydojo/pkg/db"
 )
 
 // keyMap defines a set of keybindings. To work for help it must satisfy
@@ -44,9 +49,7 @@ var keys = keyMap{
 	Down: key.NewBinding(
 		key.WithKeys("down", "j"),
 		key.WithHelp("↓/j", "move down"),
-	),
-	Left: key.NewBinding(
-		key.WithKeys("left", "h"),
+	), Left: key.NewBinding(key.WithKeys("left", "h"),
 		key.WithHelp("←/h", "move left"),
 	),
 	Right: key.NewBinding(
@@ -72,14 +75,33 @@ type homeModel struct {
 	help       help.Model
 	inputStyle lipgloss.Style
 	db         *sql.DB
+	table      table.Model
 }
 
 func InitHomeModel(db *sql.DB) homeModel {
+	columns := []table.Column{{Title: "ID", Width: 4}, {Title: "Task", Width: 100}}
+	tasks, err := query.ListEverything(db)
+	if err != nil {
+		// TODO: Add a notifier system
+		log.Fatalf("Something went wrong dawg: %s", err)
+	}
+
+	// now we will covert tasks, by flattening it out to with the table.rows format
+	rows := []table.Row{}
+	for _, val := range tasks {
+		// could've made this a one liner, but I think readability goes a longer way
+		task := []string{strconv.Itoa(val.ID), val.Task}
+		rows = append(rows, task)
+	}
+
+	table := table.New(table.WithColumns(columns), table.WithRows(rows), table.WithFocused(true))
+	table.SetStyles(DefaultTableStyles())
 	return homeModel{
 		keys:       keys,
 		help:       help.New(),
 		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
 		db:         db,
+		table:      table,
 	}
 }
 
@@ -102,7 +124,8 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m homeModel) View() string {
 	width, height := GetTermSize()
 	parent := lipgloss.NewStyle().Width(width).Height(height).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center)
+	table := lipgloss.NewStyle().Border(lipgloss.NormalBorder()).BorderForeground(lipgloss.Color(catppuccingo.Latte.Subtext1().Hex))
 	help := lipgloss.NewStyle().Width(width)
 	helpView := m.help.View(m.keys)
-	return parent.Render("Home screen") + "\n" + help.Render(helpView)
+	return parent.Render(table.Render(m.table.View())) + "\n" + help.Render(helpView)
 }

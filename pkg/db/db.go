@@ -7,6 +7,11 @@ import (
 	"log"
 )
 
+type Task struct {
+	ID   int
+	Task string
+}
+
 func New(src string) *sql.DB {
 	db, err := sql.Open("sqlite3", src)
 	if err != nil {
@@ -36,7 +41,18 @@ func Delete(db *sql.DB, id int) error {
 	return err
 }
 
-func ListEverything(db *sql.DB) (sql.Result, error) {
-	res, err := db.Exec("SELECT * FROM tasks")
-	return res, err
+func ListEverything(db *sql.DB) ([]Task, error) {
+	rows, err := db.Query("SELECT * FROM tasks")
+	tasks := []Task{}
+	for rows.Next() {
+		var task Task
+		if err := rows.Scan(&task.ID, &task.Task); err != nil {
+			log.Printf("Something went wrong %s", err)
+			return nil, err
+		}
+		defer rows.Close()
+		tasks = append(tasks, task)
+	}
+
+	return tasks, err
 }
