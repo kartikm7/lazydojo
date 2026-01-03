@@ -34,7 +34,7 @@ func (m formModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEnter:
 			db.Add(m.db, m.textInput.Value())
-			return m, nil
+			return InitHomeModel(m.db), nil
 		}
 	}
 
