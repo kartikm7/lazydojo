@@ -51,6 +51,6 @@ func (m formModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m formModel) View() string {
 	width, height := GetTermSize()
 	parent := lipgloss.NewStyle().Width(width).Height(height).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center)
-	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("420")).Padding(1, 2)
+	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#ea76cb")).Padding(1, 2)
 	return fmt.Sprint(parent.Render(text.Render(m.textInput.View())))
 }
