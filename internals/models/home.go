@@ -111,6 +111,14 @@ func (m homeModel) Init() tea.Cmd {
 
 func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+
+	// returning globalcmd
+	updated, globalcmd := DefaultBinding(msg, m, m.db)
+	if _, ok := updated.(homeModel); !ok {
+		return updated, globalcmd
+	}
+
+	// checking for local values
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -122,11 +130,8 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// this fetches the cmd for the table, and more importantly updates the table UI state
 	m.table, cmd = m.table.Update(msg)
-	updated, globalcmd := DefaultBinding(msg, m, m.db)
-	if assert, ok := updated.(homeModel); ok {
-		m = assert
-	}
-	return m, tea.Batch(cmd, globalcmd)
+
+	return m, tea.Batch(globalcmd, cmd)
 }
 
 func (m homeModel) View() string {
