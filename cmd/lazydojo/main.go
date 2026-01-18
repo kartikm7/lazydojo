@@ -2,7 +2,9 @@ package main
 
 import (
 	"database/sql" // Package for SQL database interactions
-	"log"
+	"os"
+
+	"github.com/charmbracelet/log"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/kartikm7/lazydojo/internals/models"
@@ -22,7 +24,19 @@ func main() {
 
 func (app *App) RunApp() {
 	p := tea.NewProgram(models.InitRootModel(app.db), tea.WithAltScreen())
+	logToFile()
 	if _, err := p.Run(); err != nil {
 		log.Fatalf("shit went south: %s", err)
 	}
+}
+
+func logToFile() {
+	f, err := os.OpenFile("./app.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o644)
+	if err != nil {
+		log.Fatalf("shit went south: %s", err)
+	}
+
+	defer f.Close()
+	log.SetOutput(f)
+	log.Info("Initialized Logging")
 }

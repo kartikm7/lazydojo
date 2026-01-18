@@ -4,7 +4,7 @@ package db
 
 import (
 	"database/sql"
-	"log"
+	"github.com/charmbracelet/log"
 )
 
 type Task struct {

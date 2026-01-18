@@ -1,7 +1,7 @@
 package models
 
 import (
-	"log"
+	"github.com/charmbracelet/log"
 	"os"
 
 	catppuccingo "github.com/catppuccin/go"

@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"github.com/charmbracelet/log"
 
 	catppuccin "github.com/catppuccin/go"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -37,8 +38,16 @@ func (m formModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if _, ok := updated.(formModel); !ok && !m.textInput.Focused() {
 		return updated, globalcmd
 	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		switch msg.String() {
+		case "q":
+			if !m.textInput.Focused() {
+				log.Print("come on")
+				globalcmd = nil
+			}
+		}
 		switch msg.Type {
 		case tea.KeyEnter:
 			db.Add(m.db, m.textInput.Value())
