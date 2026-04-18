@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql" // Package for SQL database interactions
+	"log/slog"
 	"os"
 
 	"github.com/charmbracelet/log"
@@ -24,19 +25,22 @@ func main() {
 
 func (app *App) RunApp() {
 	p := tea.NewProgram(models.InitRootModel(app.db), tea.WithAltScreen())
-	logToFile()
+	f := setupLogging()
+	defer f.Close()
 	if _, err := p.Run(); err != nil {
 		log.Fatalf("shit went south: %s", err)
 	}
 }
 
-func logToFile() {
+func setupLogging() *os.File {
 	f, err := os.OpenFile("./app.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o644)
 	if err != nil {
 		log.Fatalf("shit went south: %s", err)
 	}
 
-	defer f.Close()
-	log.SetOutput(f)
-	log.Info("Initialized Logging")
+	handler := slog.NewTextHandler(f, nil)
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+	slog.Info("Initialized Logging")
+	return f
 }
