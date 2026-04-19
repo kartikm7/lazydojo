@@ -69,6 +69,9 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case m.keys.Help.Help().Key:
 			m.help.ShowAll = !m.help.ShowAll
+		case tea.KeyEnter.String():
+			focusedValues := m.table.SelectedRow()
+			return InitTimerModel(&focusedValues, m.db), nil
 		default:
 		}
 	}

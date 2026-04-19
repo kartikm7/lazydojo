@@ -15,8 +15,6 @@ func DefaultBinding(msg tea.Msg, m tea.Model, db *sql.DB) (tea.Model, tea.Cmd) {
 		case "1":
 			return InitHomeModel(db), nil
 		case "2":
-			return InitTimerModel(db), nil
-		case "3":
 			return InitFormModel(db), nil
 		default:
 			return m, nil

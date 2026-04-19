@@ -7,21 +7,23 @@ import (
 	catppuccin "github.com/catppuccin/go"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/stopwatch"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kartikm7/lazydojo/internals/models/helpbars"
 )
 
 type timerModel struct {
+	taskRow   *table.Row
 	keys      helpbars.StopWatchKeyMap
 	help      help.Model
 	stopwatch stopwatch.Model
 	db        *sql.DB
 }
 
-func InitTimerModel(db *sql.DB) timerModel {
+func InitTimerModel(task *table.Row, db *sql.DB) timerModel {
 	stopwatchModel := stopwatch.New()
-	return timerModel{helpbars.StopWatchKeys, helpbars.CreateStopWatchHelpBar(), stopwatchModel, db}
+	return timerModel{task, helpbars.StopWatchKeys, helpbars.CreateStopWatchHelpBar(), stopwatchModel, db}
 }
 
 func (m timerModel) Init() tea.Cmd {
@@ -55,6 +57,8 @@ func (m timerModel) View() string {
 	helpHeight := help.GetHeight()
 	helpView := m.help.View(m.keys)
 	parent := lipgloss.NewStyle().Width(width).Height(height - helpHeight).AlignHorizontal(lipgloss.Center).AlignVertical(lipgloss.Center)
-	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(catppuccin.Latte.Lavender().Hex)).Padding(1, 2)
-	return fmt.Sprint(parent.Render(text.Render(m.stopwatch.View())) + "\n" + help.Render(helpView))
+	textParent := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(catppuccin.Latte.Lavender().Hex)).Padding(2, 6)
+	heading := lipgloss.NewStyle().Italic(true).Foreground(lipgloss.Color(catppuccin.Latte.Lavender().Hex))
+	task := (*m.taskRow)
+	return fmt.Sprint(parent.Render(textParent.Render(heading.Render(task[1])+" · "+m.stopwatch.View())) + "\n" + help.Render(helpView))
 }
