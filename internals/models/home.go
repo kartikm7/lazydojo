@@ -24,7 +24,7 @@ type homeModel struct {
 }
 
 func InitHomeModel(db *sql.DB) homeModel {
-	columns := []table.Column{{Title: "ID", Width: 4}, {Title: "Task", Width: 100}}
+	columns := []table.Column{{Title: "ID", Width: 4}, {Title: "Task", Width: 100}, {Title: "Completed", Width: 10}}
 	tasks, err := query.ListEverything(db)
 	if err != nil {
 		// TODO: Add a notifier system
@@ -35,7 +35,7 @@ func InitHomeModel(db *sql.DB) homeModel {
 	rows := []table.Row{}
 	for _, val := range tasks {
 		// could've made this a one liner, but I think readability goes a longer way
-		task := []string{strconv.Itoa(val.ID), val.Task}
+		task := []string{strconv.Itoa(val.ID), val.Task, strconv.FormatBool(val.Completed)}
 		rows = append(rows, task)
 	}
 

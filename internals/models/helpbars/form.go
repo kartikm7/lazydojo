@@ -57,13 +57,9 @@ var AddTaskKeys = AddTaskKeyMap{
 		key.WithKeys("1"),
 		key.WithHelp("1", "home"),
 	),
-	Timer: key.NewBinding(
-		key.WithKeys("2"),
-		key.WithHelp("2", "timer"),
-	),
 	AddTask: key.NewBinding(
-		key.WithKeys("3"),
-		key.WithHelp("3", "add task"),
+		key.WithKeys("2"),
+		key.WithHelp("2", "add a task"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "ctrl+c"),

@@ -4,12 +4,14 @@ package db
 
 import (
 	"database/sql"
+
 	"github.com/charmbracelet/log"
 )
 
 type Task struct {
-	ID   int
-	Task string
+	ID        int
+	Task      string
+	Completed bool
 }
 
 func New(src string) *sql.DB {
@@ -22,7 +24,8 @@ func New(src string) *sql.DB {
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS tasks (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		task TEXT
+		task TEXT,
+		completed BOOLEAN
 		)
 		`)
 	if err != nil {
@@ -31,8 +34,10 @@ func New(src string) *sql.DB {
 	return db
 }
 
+// Add allows us to add a task to the sqlite3 db
+// it also predefines the task completion as false and time spent as empty
 func Add(db *sql.DB, task string) error {
-	_, err := db.Exec("INSERT INTO tasks(task) VALUES(?)", task)
+	_, err := db.Exec("INSERT INTO tasks(task, completed) VALUES(?,?)", task, false)
 	return err
 }
 
@@ -46,7 +51,7 @@ func ListEverything(db *sql.DB) ([]Task, error) {
 	tasks := []Task{}
 	for rows.Next() {
 		var task Task
-		if err := rows.Scan(&task.ID, &task.Task); err != nil {
+		if err := rows.Scan(&task.ID, &task.Task, &task.Completed); err != nil {
 			log.Printf("Something went wrong %s", err)
 			return nil, err
 		}
