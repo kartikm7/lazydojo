@@ -60,7 +60,7 @@ var HomeKeys = HomeKeyMap{
 	),
 	AddTask: key.NewBinding(
 		key.WithKeys("2"),
-		key.WithHelp("3", "add task"),
+		key.WithHelp("2", "add task"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "ctrl+c"),
