@@ -15,7 +15,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kartikm7/lazydojo/internals/models/helpbars"
 	database "github.com/kartikm7/lazydojo/pkg/db" // I don't like how it's not consistent might aswell name the package database
-	"github.com/kartikm7/lazydojo/pkg/db/utils"
+	"github.com/kartikm7/lazydojo/pkg/utils"
 )
 
 type homeModel struct {
