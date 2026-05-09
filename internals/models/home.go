@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
+	"log/slog"
 	"strconv"
 
 	"github.com/charmbracelet/log"
@@ -12,7 +14,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/kartikm7/lazydojo/internals/models/helpbars"
-	query "github.com/kartikm7/lazydojo/pkg/db"
+	database "github.com/kartikm7/lazydojo/pkg/db" // I don't like how it's not consistent might aswell name the package database
+	"github.com/kartikm7/lazydojo/pkg/db/utils"
 )
 
 type homeModel struct {
@@ -25,7 +28,7 @@ type homeModel struct {
 
 func InitHomeModel(db *sql.DB) homeModel {
 	columns := []table.Column{{Title: "ID", Width: 4}, {Title: "Task", Width: 100}, {Title: "Completed", Width: 10}}
-	tasks, err := query.ListEverything(db)
+	tasks, err := database.ListEverything(db)
 	if err != nil {
 		// TODO: Add a notifier system
 		log.Fatalf("Something went wrong dawg: %s", err)
@@ -72,7 +75,29 @@ func (m homeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEnter.String():
 			focusedValues := m.table.SelectedRow()
 			return InitTimerModel(&focusedValues, m.db), nil
+		case "x":
+			focusedValues := m.table.SelectedRow()
+
+			// getting the last stored value
+			previousValue, err := strconv.ParseBool(focusedValues[2])
+			if err != nil {
+				slog.Error("Somehow the value was not a boolean, shouldn't be happening", "error", err)
+			}
+			focusedValues[2] = fmt.Sprintf("%v", !previousValue)
+			m.table.UpdateViewport() // we update the just the table, THAT'S SO COOOl
+			// now we run the DB updation
+			idx, err := strconv.Atoi(focusedValues[0])
+			if err != nil {
+				slog.Info("Shit something went south", "error", err)
+			}
+			updatedValues := database.Values{}
+			updatedValues.Completed = utils.Pointer(!previousValue)
+			err = database.Update(m.db, idx, updatedValues)
+			if err != nil {
+				slog.Error("The update failed somehow the previous logs should help", "error", err)
+			}
 		default:
+			slog.Info(msg.String())
 		}
 	}
 
