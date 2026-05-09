@@ -4,6 +4,10 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"log/slog"
+	"reflect"
+	"strings"
 
 	"github.com/charmbracelet/log"
 )
@@ -12,6 +16,11 @@ type Task struct {
 	ID        int
 	Task      string
 	Completed bool
+}
+
+type Values struct {
+	Completed *bool
+	Task      *string
 }
 
 func New(src string) *sql.DB {
@@ -44,6 +53,34 @@ func Add(db *sql.DB, task string) error {
 func Delete(db *sql.DB, id int) error {
 	_, err := db.Exec("DELETE FROM tasks WHERE id = ?", id)
 	return err
+}
+
+func Update(db *sql.DB, id int, values Values) error {
+	v := reflect.ValueOf(values)
+	for i := 0; i < v.NumField(); i++ {
+		column := v.Type().Field(i).Name
+		value := v.Field(i)
+		if value.Interface() != nil {
+			// man this shit is the coolest thing ever, so damn handy
+			if value.IsZero() {
+				slog.Info("[Database] Not a valid value continuing to next iteration")
+				continue
+			}
+			value := value.Elem()
+			convertedString := fmt.Sprintf("%v", value)
+			query := fmt.Sprintf("UPDATE tasks SET %v = ? WHERE id = ?", strings.ToLower(column))
+			slog.Info("[Database] Running the update method", "query", query)
+			// Now, the problem with the above log is that we don't print the passed values
+			// But, I think the db.Exec should be having some security placeholders - still does not feel right
+			result, err := db.Exec(query, convertedString, id)
+			if err != nil {
+				slog.Info("[Database] Fuck something went wrong", "error", err.Error())
+			} else {
+				slog.Info("[Database] Successfully ran the query", "result", result)
+			}
+		}
+	}
+	return nil
 }
 
 func ListEverything(db *sql.DB) ([]Task, error) {
