@@ -1,4 +1,4 @@
-package components
+package stopwatch
 
 import (
 	"log/slog"
